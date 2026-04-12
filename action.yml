@@ -1,0 +1,58 @@
+name: Deploy autodiscover-email-settings
+description: >
+  Checks out the worker source at the pinned ref and deploys it to
+  Cloudflare Workers using the caller's wrangler.toml.
+
+inputs:
+  cloudflare_api_token:
+    description: Cloudflare API token. See README.md for required permissions.
+    required: true
+  config_path:
+    description: >
+      Path to the wrangler.toml config file to use for deployment relative to the repository root.
+      See wrangler.toml.example for reference.
+    required: false
+    default: wrangler.toml
+  worker_name:
+    description: >
+      Name to deploy the worker under. The name specified in wrangler.toml will be ignored.
+    required: false
+    default: autodiscover-email-settings
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Read action metadata
+      id: meta
+      shell: bash
+      run: |
+        echo "ref=$(basename "${{ github.action_path }}")" >> "$GITHUB_OUTPUT"
+        echo "wrangler=$(grep -o '"wrangler@[^"]*"' "${{ github.action_path }}/bun.lock" \
+          | head -1 | sed 's/"wrangler@\([^"]*\)".*/\1/')" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/checkout@v6
+      with:
+        repository: jogerj/autodiscover-email-settings
+        ref: ${{ steps.meta.outputs.ref }}
+        path: _src
+
+    - uses: oven-sh/setup-bun@v2
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: _src
+      run: bun install --frozen-lockfile
+
+    - uses: cloudflare/wrangler-action@v3
+      with:
+        packageManager: bun
+        workingDirectory: _src
+        apiToken: ${{ inputs.cloudflare_api_token }}
+        wranglerVersion: ${{ steps.meta.outputs.wrangler }}
+        command: >
+          deploy src/index.ts
+          --name ${{ inputs.worker_name }}
+          --compatibility-date 2026-04-12
+          --config ${{ github.workspace }}/${{ inputs.config_path }}

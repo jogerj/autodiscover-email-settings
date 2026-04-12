@@ -1,51 +1,134 @@
-
-name: Docker Image CI
+name: CI
 
 on:
   pull_request:
   push:
     branches:
       - main
-      - master
-      - develop
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platforms: ['linux/amd64'] # Not working yet in GHA (but works locally): linux/arm64,linux/arm/v7,linux/arm/v6
-
     steps:
-      - name: Check Out Repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
-      - name: Execute CI build hooks
-        id: docker_build
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/cache@v5
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run tests
+        run: bun run type-check && bun run test
+      - name: Bundle worker
         run: |
-          # Export variables to tag against GitHub Container Registry
-          #export DOCKER_REGISTRY=ghcr.io
-          #export DOCKER_REPO=${{ github.repository }}
-          ./hooks/run build ${{ matrix.platforms }}
+          OUT="$GITHUB_WORKSPACE/.wrangler-out"
+          # File extension must be .toml for wrangler to parse safely
+          cp wrangler.toml.example wrangler.toml
+          bunx wrangler deploy --dry-run --outdir "$OUT"
+          echo "bundle_path=$OUT/index.js" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: worker-bundle
+          path: .wrangler-out/index.js
+          if-no-files-found: error
+          retention-days: 1
 
-      - name: Display docker images
-        run: docker images
+  release-please:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Execute CI test hooks
-        id: docker_test
+  release-worker:
+    needs: release-please
+    if: needs.release-please.outputs.releases_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: worker-bundle
+
+      - name: Attach worker bundle to release
         run: |
-          ./hooks/run test ${{ matrix.platforms }}
+          mv index.js worker.js
+          gh release upload ${{ needs.release-please.outputs.tag_name }} worker.js
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Execute CI push hooks
-        id: docker_push
-        if: ${{ github.event_name == 'push' && ( github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' ) }}
+      # Update floating major (v2) and minor (v2.3) tags to point to this release,
+      # so callers can pin to a major or minor version without tracking exact patch tags.
+      - name: Update floating version tags
         run: |
-          # Export variables to login and push to DockerHub Registry
-          export DOCKER_LOGIN=${{ secrets.DOCKERHUB_REGISTRY_LOGIN }}
-          export DOCKER_PASSWORD=${{ secrets.DOCKERHUB_REGISTRY_TOKEN }}
-          ./hooks/run push ${{ matrix.platforms }}
-          # Export variables to login and push to GitHub Container Registry
-          #export DOCKER_REGISTRY=ghcr.io
-          #export DOCKER_LOGIN=${{ github.repository_owner }}
-          #export DOCKER_PASSWORD=${{ secrets.GITHUB_REGISTRY_TOKEN }}
-          #./hooks/run push ${{ matrix.platforms }}
+          TAG="${{ needs.release-please.outputs.tag_name }}"
+          MAJOR=$(echo "$TAG" | sed 's/\..*//')
+          MINOR=$(echo "$TAG" | sed 's/\.[^.]*$//')
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq '.object.sha')
+          for FLOATING in "$MAJOR" "$MINOR"; do
+            gh api "repos/$GITHUB_REPOSITORY/git/refs/tags/$FLOATING" \
+              --method PATCH --field sha="$SHA" --field force=true 2>/dev/null || \
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+              --method POST --field ref="refs/tags/$FLOATING" --field sha="$SHA"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-docker:
+    needs: release-please
+    if: needs.release-please.outputs.releases_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+
+      - name: Set up QEMU (multi-platform emulation)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: jogerj/autodiscover-email-settings
+          tags: |
+            type=semver,pattern={{version}},value=${{ needs.release-please.outputs.tag_name }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.tag_name }}
+            type=semver,pattern={{major}},value=${{ needs.release-please.outputs.tag_name }}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

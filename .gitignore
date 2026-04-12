@@ -29,3 +29,12 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+
+# Wrangler
+.wrangler
+.dev.vars
+dist
+wrangler.toml
+
+# npm lockfile (project uses bun)
+package-lock.json
