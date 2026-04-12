@@ -1,27 +1,21 @@
 {
   "name": "autodiscover-email-settings",
-  "version": "1.4.0",
+  "version": "2.0.0",
+  "type": "module",
   "description": "Provides IMAP/SMTP/LDAP Autodiscover capabilities on Microsoft Outlook/Apple Mail, Autoconfig capabilities for Thunderbird, and Configuration Profiles for iOS/Apple Mail.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
-  },
-  "engines": {
-    "node": ">=4.0.0"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/monogramm/autodiscover-email-settings.git"
+    "url": "git+https://github.com/jogerj/autodiscover-email-settings.git"
   },
-  "author": "Monogramm",
+  "author": "jogerj",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/monogramm/autodiscover-email-settings/issues"
+    "url": "https://github.com/jogerj/autodiscover-email-settings/issues"
   },
-  "homepage": "https://github.com/monogramm/autodiscover-email-settings#readme",
+  "homepage": "https://github.com/jogerj/autodiscover-email-settings#readme",
   "keywords": [
-    "monogramm",
+    "jogerj",
+	"monogramm",
     "autoconfigure",
     "autoconf",
     "autodiscover",
@@ -30,14 +24,25 @@
     "apple mail",
     "imap",
     "smtp",
-    "ldap"
+    "ldap",
+    "cloudflare",
+    "workers",
+    "serverless"
   ],
-  "dependencies": {
-    "koa": "^1.0.0",
-    "koa-buddy": "^0.1.0",
-    "koa-router": "^5.1.2",
-    "koa-swig": "^2.0.0",
-    "minimist": "^1.2.6",
-    "qs": "^6.10.3"
+  "scripts": {
+    "dev": "wrangler dev",
+    "server": "bun run src/server.ts",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "@types/node": "^22.19.17",
+    "hono": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "wrangler": "^3.0.0"
   }
 }
