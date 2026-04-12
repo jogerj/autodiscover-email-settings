@@ -1,0 +1,120 @@
+# Deployment workflow template for Cloudflare Workers.
+#
+# Usage:
+#   1. Copy this file to .github/workflows/deploy.yml in your private repo
+#      (remove the .template extension so GitHub Actions picks it up).
+#   2. Add CF_API_TOKEN to Settings → Secrets and variables → Actions.
+#   3. If you use GitHub Environments (recommended for secret scoping),
+#      create environments named "staging" and "production" in your repo settings.
+#   4. In your wrangler.toml, declare [env.staging] and [env.production] stanzas.
+#      Sensitive values (UUIDs, passwords) should be set via:
+#        wrangler secret put VAR_NAME --env staging
+#        wrangler secret put VAR_NAME --env production
+#
+# This workflow supports two calling patterns:
+#   A. Manual dispatch (via GitHub UI / gh cli) — choose the environment interactively.
+#   B. workflow_call — call this workflow from another workflow and pass the
+#      environment as an input, e.g. based on which branch was pushed.
+#
+# See the "Caller example" section at the bottom of this file.
+
+name: Deploy to Cloudflare Workers
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment (must match a wrangler.toml [env.<name>] stanza)"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment (must match a wrangler.toml [env.<name>] stanza)"
+        required: true
+        type: string
+    secrets:
+      CF_API_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Maps to a GitHub Environment for per-environment secret scoping.
+    # Remove this line if you are not using GitHub Environments.
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run type-check
+
+      - run: npm test
+
+      - name: Deploy to Cloudflare Workers (${{ inputs.environment }})
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          # Passes --env <environment> to wrangler deploy, selecting the
+          # matching [env.<name>] stanza from wrangler.toml.
+          environment: ${{ inputs.environment }}
+
+# ─── Caller example ──────────────────────────────────────────────────────────
+#
+# Place this in .github/workflows/ci-cd.yml in your private repo to
+# automatically deploy on push, routing branches to environments:
+#
+# name: CI/CD
+# on:
+#   push:
+#     branches: [main, develop]
+#
+# jobs:
+#   deploy-staging:
+#     if: github.ref == 'refs/heads/develop'
+#     uses: ./.github/workflows/deploy.yml
+#     with:
+#       environment: staging
+#     secrets:
+#       CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+#
+#   deploy-production:
+#     if: github.ref == 'refs/heads/main'
+#     uses: ./.github/workflows/deploy.yml
+#     with:
+#       environment: production
+#     secrets:
+#       CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+#
+# ─── wrangler.toml example ───────────────────────────────────────────────────
+#
+# name = "autodiscover-email-settings"
+# main = "src/index.ts"
+# compatibility_date = "2024-09-23"
+#
+# [vars]
+# DOMAIN = "example.com"
+# # ... other dev defaults
+#
+# [env.staging]
+# name = "autodiscover-email-settings-staging"
+# [env.staging.vars]
+# DOMAIN = "staging.example.com"
+# # secrets: wrangler secret put PROFILE_UUID --env staging
+#
+# [env.production]
+# name = "autodiscover-email-settings"
+# [env.production.vars]
+# DOMAIN = "example.com"
+# # secrets: wrangler secret put PROFILE_UUID --env production
