@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: bug
-assignees: madmath03
+assignees: jogerj
 
 ---
 
@@ -24,15 +24,6 @@ A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
-
-**Node (please complete the following information):**
-
--   Node / NPM Version: (e.g. Node version 12.16.1)
-
-**Docker (please complete the following information):**
-
--   Docker / Docker-compose Version: (e.g. Docker version 18.03.0-ce, build 0520e24)
--   Image (e.g. 7.0-apache)
 
 **Desktop (please complete the following information):**
 

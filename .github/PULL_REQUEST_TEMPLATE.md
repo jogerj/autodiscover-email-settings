@@ -9,11 +9,6 @@ Some key notes before you open a PR:
  5. Update necessary Documentation
  6. Put `closes #XXXX` in your comment to auto-close the issue that your PR fixes
 
-
-Also, if you're new here
-
-- Contribution Guide => https://github.com/Monogramm/autodiscover-email-settings/blob/master/CONTRIBUTING.md
-
 -->
 
 > Please provide enough information so that others can review your pull request:
