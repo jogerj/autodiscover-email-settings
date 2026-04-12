@@ -1,0 +1,15 @@
+node_modules
+.wrangler
+.dev.vars
+dist
+test
+*.md
+.git
+.gitignore
+.gitattributes
+.editorconfig
+wrangler.toml
+tsconfig.test.json
+vitest.config.ts
+package-lock.json
+bun.lockb
