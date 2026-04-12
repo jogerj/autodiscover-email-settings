@@ -35,5 +35,5 @@ node_modules
 .dev.vars
 dist
 
-# Bun
-bun.lockb
+# npm lockfile (project uses bun)
+package-lock.json

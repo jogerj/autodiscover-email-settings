@@ -3,8 +3,8 @@ WORKDIR /app
 
 # Install production dependencies only
 FROM base AS deps
-COPY package.json ./
-RUN bun install --production
+COPY package.json bun.lockb* ./
+RUN bun install --frozen-lockfile --production
 
 # Final image
 FROM base
