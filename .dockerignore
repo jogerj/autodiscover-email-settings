@@ -11,5 +11,3 @@ test
 wrangler.toml
 tsconfig.test.json
 vitest.config.ts
-package-lock.json
-bun.lockb
