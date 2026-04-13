@@ -2,7 +2,7 @@
 
 Some key notes before you open a PR:
 
- 1. Select which branch should this PR be merged in? By default, you should always merge to the develop branch.
+ 1. Select which branch should this PR be merged in? By default, you should always merge to the main branch.
  2. PR name follows [convention](http://karma-runner.github.io/4.0/dev/git-commit-msg.html)
  3. All tests pass locally, UI and Unit tests
  4. All business logic and validations must be on the server-side
