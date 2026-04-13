@@ -31,7 +31,7 @@ Runs at the edge globally with no infrastructure to manage.
 ```bash
 git clone https://github.com/jogerj/autodiscover-email-settings.git
 cd autodiscover-email-settings
-npm install
+bun install
 ```
 
 #### 2. Configure `wrangler.toml`
@@ -64,7 +64,7 @@ wrangler secret put LDAP_UUID
 #### 3. Test locally
 
 ```bash
-npm run dev          # starts http://localhost:8787
+bun run dev          # starts http://localhost:8787
 bash test/smoke.sh   # run smoke tests against the local server
 ```
 
@@ -78,8 +78,8 @@ DOMAIN=mycompany.com
 #### 4. Deploy
 
 ```bash
-npm run deploy
-# or: npx wrangler deploy --env production
+bun run deploy
+# or: bunx wrangler deploy --env production
 ```
 
 ---
@@ -236,13 +236,13 @@ For Cloudflare Workers, `<service-ip>` is not needed — point the subdomains at
 ## Development
 
 ```bash
-npm install
+bun install
 
-npm run dev         # CF Workers local dev (http://localhost:8787, uses wrangler.toml [vars])
-npm test            # unit tests (Vitest)
-npm run type-check  # TypeScript — checks both source and test tsconfigs
+bun run dev         # CF Workers local dev (http://localhost:8787, uses wrangler.toml [vars])
+bun test            # unit tests (Vitest)
+bun run type-check  # TypeScript — checks both source and test tsconfigs
 
-npm run server      # Bun local server (http://localhost:8000, uses process.env)
+bun run server      # Bun local server (http://localhost:8000, uses process.env)
 ```
 
 ---
