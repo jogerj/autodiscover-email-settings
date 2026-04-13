@@ -1,14 +1,17 @@
-<!DOCTYPE html>
+import type { Settings } from "../types";
+
+export function indexHtml(s: Settings): string {
+  return `<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <meta name="description" content="{{info.name}} Email Settings">
-    <meta name="author" content="{{info.name}}">
+    <meta name="description" content="${s.info.name} Email Settings">
+    <meta name="author" content="${s.info.name}">
 
-    <title>{{info.name}}</title>
+    <title>${s.info.name}</title>
 
     <link rel="shortcut icon" href="favicon.ico" />
 
@@ -97,7 +100,6 @@
             display: block;
             width: 100%;
             margin-bottom: 0;
-            /* Override default `<label>` margin */
             line-height: 1.5;
             color: #495057;
             border: 1px solid transparent;
@@ -236,7 +238,7 @@
 
 <body id="body" data-spy="scroll" data-target="#navbar-main" class="light">
     <nav id="navbar-main" class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">{{info.name}}</a>
+        <a class="navbar-brand" href="#">${s.info.name}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault"
             aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -247,9 +249,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#automatic">Automatic</a>
                 </li>
-                {% if mobile.identifier %}<li class="nav-item">
+                ${s.mobile.identifier ? `<li class="nav-item">
                     <a class="nav-link" href="#mobileconfig">iOS</a>
-                </li>{% endif %}
+                </li>` : ""}
                 <li class="nav-item">
                     <a class="nav-link" href="#manualconfig">Manual configuration</a>
                 </li>
@@ -272,7 +274,7 @@
     <main role="main">
         <div class="jumbotron">
             <div class="container">
-                <h1 class="display-4">{{info.name}} generic settings</h1>
+                <h1 class="display-4">${s.info.name} generic settings</h1>
                 <p class="lead">Generic settings support page</p>
                 <p>This is a simple support page for email automatic configuration service.
                     It provides IMAP/POP/SMTP/LDAP Autodiscover capabilities on Microsoft Outlook/Apple Mail, Autoconfig
@@ -289,14 +291,14 @@
             <div class="mb-5">
                 <p>Thanks to the <a href="/mail/config-v1.1.xml">autoconfig</a> and
                     <a href="/autodiscover/autodiscover.xml">autodiscover</a> services,
-                    <strong>most of the recent mail clients</strong> (<em>Microsoft Outlook</em>, <em>Apple Mail</em>, 
+                    <strong>most of the recent mail clients</strong> (<em>Microsoft Outlook</em>, <em>Apple Mail</em>,
                     <em>Mozilla Thunderbird</em>, ...) <strong>should automatically be configured</strong> with the
-                    recommended settings for this email server just after entering your email address <code>@{{domain}}</code>.</p>
+                    recommended settings for this email server just after entering your email address <code>@${s.domain}</code>.</p>
 
                 <p>If you encounter some issues, depending on your situation, you can:</p>
                 <ul>
-                    {% if mobile.identifier %}<li>easily configure your Apple Mobile devices (<em>iPhone / iPad</em>) with
-                        <a href="#mobileconfig">this simple form</a></li>{% endif %}
+                    ${s.mobile.identifier ? `<li>easily configure your Apple Mobile devices (<em>iPhone / iPad</em>) with
+                        <a href="#mobileconfig">this simple form</a></li>` : ""}
                     <li>setup your email application with the <a href="#manualconfig">manual configuration</a></li>
                 </ul>
             </div>
@@ -305,8 +307,7 @@
 
         </div> <!-- /container -->
 
-        {%- if mobile.identifier %}
-        <div class="container">
+        ${s.mobile.identifier ? `<div class="container">
             <h3 id="mobileconfig" class="h3 font-weight-normal">Apple Configuration Profile</h3>
 
             <div class="mb-5">
@@ -327,8 +328,7 @@
 
             <hr>
 
-        </div> <!-- /container -->
-        {% endif -%}
+        </div> <!-- /container -->` : ""}
 
         <div class="container">
             <h3 id="manualconfig" class="h3 font-weight-normal">Manual configuration</h3>
@@ -337,86 +337,79 @@
                 <p>Copy the following settings to your email application.</p>
 
                 <div class="row">
-                    {%- if imap.host %}
-                    <div class="col-md-6">
+                    ${s.imap.host ? `<div class="col-md-6">
                         <h5 id="manualconfig-imap">Incoming server (IMAP)</h5>
                         <dl>
                             <dt>Hostname <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy IMAP hostname"
                                 onclick="copy('manualconfig-imap-hostname')">Copy</button></dt>
-                            <dd id="manualconfig-imap-hostname">{{imap.host}}</dd>
+                            <dd id="manualconfig-imap-hostname">${s.imap.host}</dd>
 
                             <dt>Port <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy IMAP port"
                                 onclick="copy('manualconfig-imap-port')">Copy</button></dt>
-                            <dd id="manualconfig-imap-port">{{imap.port}}</dd>
+                            <dd id="manualconfig-imap-port">${s.imap.port}</dd>
 
                             <dt>Encryption <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy IMAP encryption"
                                 onclick="copy('manualconfig-imap-socket')">Copy</button></dt>
-                            <dd id="manualconfig-imap-socket">{{imap.socket}}</dd>
+                            <dd id="manualconfig-imap-socket">${s.imap.socket}</dd>
                         </dl>
-                    </div>
-                    {% endif -%}
+                    </div>` : ""}
 
-                    {%- if pop.host %}
-                    <div class="col-md-6">
+                    ${s.pop.host ? `<div class="col-md-6">
                         <h5 id="manualconfig-pop">Incoming server (POP)</h5>
                         <dl>
                             <dt>Hostname <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy POP hostname"
                                 onclick="copy('manualconfig-pop-hostname')">Copy</button></dt>
-                            <dd id="manualconfig-pop-hostname">{{pop.host}}</dd>
+                            <dd id="manualconfig-pop-hostname">${s.pop.host}</dd>
 
                             <dt>Port <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy POP port"
                                 onclick="copy('manualconfig-pop-port')">Copy</button></dt>
-                            <dd id="manualconfig-pop-port">{{pop.port}}</dd>
+                            <dd id="manualconfig-pop-port">${s.pop.port}</dd>
 
                             <dt>Encryption <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy POP encryption"
                                 onclick="copy('manualconfig-pop-socket')">Copy</button></dt>
-                            <dd id="manualconfig-pop-socket">{{pop.socket}}</dd>
+                            <dd id="manualconfig-pop-socket">${s.pop.socket}</dd>
                         </dl>
-                    </div>
-                    {% endif -%}
+                    </div>` : ""}
                 </div>
 
                 <div class="row">
-                    {%- if smtp.host %}
-                    <div class="col-md-6">
+                    ${s.smtp.host ? `<div class="col-md-6">
                         <h5 id="manualconfig-smtp">Outgoing server (SMTP)</h5>
                         <dl>
                             <dt>Hostname <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy SMTP hostname"
                                 onclick="copy('manualconfig-smtp-hostname')">Copy</button></dt>
-                            <dd id="manualconfig-smtp-hostname">{{smtp.host}}</dd>
+                            <dd id="manualconfig-smtp-hostname">${s.smtp.host}</dd>
 
                             <dt>Port <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy SMTP port"
                                 onclick="copy('manualconfig-smtp-port')">Copy</button></dt>
-                            <dd id="manualconfig-smtp-port">{{smtp.port}}</dd>
+                            <dd id="manualconfig-smtp-port">${s.smtp.port}</dd>
 
                             <dt>Encryption <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy SMTP encryption"
                                 onclick="copy('manualconfig-smtp-socket')">Copy</button></dt>
-                            <dd id="manualconfig-smtp-socket">{{smtp.socket}}</dd>
+                            <dd id="manualconfig-smtp-socket">${s.smtp.socket}</dd>
                         </dl>
-                    </div>
-                    {% endif -%}
+                    </div>` : ""}
                 </div>
 
-                {%- if mobilesync.url %}
-                <p>If you want to connect using ActiveSync on your mobile, you can connect to the following host.</p>
+                ${s.mobilesync.url ? `<p>If you want to connect using ActiveSync on your mobile, you can connect to the following host.</p>
                 <div class="row">
                     <div class="col-md-12">
                         <h5 id="manualconfig-mobilesync">ActiveSync (Mobile)</h5>
@@ -425,13 +418,12 @@
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy ActiveSync URL"
                                 onclick="copy('manualconfig-mobilesync-url')">Copy</button></dt>
-                            <dd id="manualconfig-mobilesync-url">{{mobilesync.url}}</dd>
+                            <dd id="manualconfig-mobilesync-url">${s.mobilesync.url}</dd>
                         </dl>
                     </div>
-                </div>
-                {% endif -%}
-                {%- if ldap.host %}
-                <p>If your email application supports LDAP contacts, copy the following settings.</p>
+                </div>` : ""}
+
+                ${s.ldap.host ? `<p>If your email application supports LDAP contacts, copy the following settings.</p>
 
                 <div class="row">
                     <div class="col-md-12">
@@ -441,41 +433,40 @@
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP hostname"
                                 onclick="copy('manualconfig-ldap-hostname')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-hostname">{{ldap.host}}</dd>
+                            <dd id="manualconfig-ldap-hostname">${s.ldap.host}</dd>
 
                             <dt>Port <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP port"
                                 onclick="copy('manualconfig-ldap-port')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-port">{{ldap.port}}</dd>
+                            <dd id="manualconfig-ldap-port">${s.ldap.port}</dd>
 
                             <dt>Encryption <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP encryption"
                                 onclick="copy('manualconfig-ldap-socket')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-socket">{{ldap.socket}}</dd>
+                            <dd id="manualconfig-ldap-socket">${s.ldap.socket}</dd>
 
                             <dt>Base <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP base"
                                 onclick="copy('manualconfig-ldap-base')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-base">{{ldap.base}}</dd>
+                            <dd id="manualconfig-ldap-base">${s.ldap.base}</dd>
 
                             <dt>Username (replace <code>your.username</code> with your actual username) <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP template username"
                                 onclick="copy('manualconfig-ldap-username')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-username">{{ldap.userfield}}=<code>your.username</code>,{{ldap.usersbase}}</dd>
+                            <dd id="manualconfig-ldap-username">${s.ldap.userfield}=<code>your.username</code>,${s.ldap.usersbase}</dd>
 
                             <dt>Search Filter <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 title="Copy LDAP search filter"
                                 onclick="copy('manualconfig-ldap-searchfilter')">Copy</button></dt>
-                            <dd id="manualconfig-ldap-searchfilter">{{ldap.searchfilter}}</dd>
+                            <dd id="manualconfig-ldap-searchfilter">${s.ldap.searchfilter}</dd>
                         </dl>
                     </div>
-                </div>
-                {% endif -%}
+                </div>` : ""}
             </div>
 
             <hr>
@@ -485,10 +476,10 @@
     </main>
 
     <footer class="container">
-        <p class="mt-5 mb-3 text-muted text-center">&copy; {{info.name}}</p>
+        <p class="mt-5 mb-3 text-muted text-center">&copy; ${s.info.name}</p>
     </footer>
 
-    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Bootstrap core JavaScript -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
         crossorigin="anonymous"></script>
@@ -499,7 +490,7 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
 
-    <!-- Custom JavaScript ================================================== -->
+    <!-- Custom JavaScript -->
     <script>
         const mainThemeCookie = "main_theme";
         let bodyClass;
@@ -513,4 +504,5 @@
     </script>
 </body>
 
-</html>
+</html>`;
+}

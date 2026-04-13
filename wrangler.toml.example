@@ -1,0 +1,122 @@
+# wrangler.toml.example
+#
+# Copy this file to wrangler.toml and fill in your values.
+#
+# Usage:
+#   cp wrangler.toml.example wrangler.toml
+#   # edit wrangler.toml with your settings
+#   wrangler dev          # local dev on http://localhost:8787
+#   wrangler deploy       # deploy to Cloudflare Workers
+#
+# Sensitive values (UUIDs) must be set as secrets rather than vars:
+#   wrangler secret put PROFILE_UUID
+#   wrangler secret put MAIL_UUID
+#   wrangler secret put LDAP_UUID
+#
+# For multi-environment deployments (staging / production), add
+# [env.staging] and [env.production] stanzas at the bottom of this file.
+# See the commented example at the end of this file.
+
+name = "autodiscover-email-settings"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+[vars]
+
+# ── General ──────────────────────────────────────────────────────────────────
+
+# Display name shown in autodiscover responses and the support page.
+COMPANY_NAME = "Example Corp"
+
+# URL of this autodiscover service — shown in autodiscover responses.
+SUPPORT_URL = "https://autodiscover.example.com"
+
+# The email domain this service configures. Must match your MX records.
+DOMAIN = "example.com"
+
+# ── IMAP ─────────────────────────────────────────────────────────────────────
+# Leave IMAP_HOST empty to disable IMAP in all responses.
+# IMAP_SOCKET: SSL | STARTTLS | None
+#   SSL      — implicit TLS; use with port 993
+#   STARTTLS — explicit TLS upgrade; use with port 143
+#   None     — plaintext (not recommended)
+
+IMAP_HOST   = "imap.example.com"
+IMAP_PORT   = "993"
+IMAP_SOCKET = "SSL"
+
+# ── POP3 ─────────────────────────────────────────────────────────────────────
+# Leave POP_HOST empty to disable POP3 in all responses.
+# POP_SOCKET: SSL | STARTTLS | None
+#   SSL      — implicit TLS; use with port 995
+#   STARTTLS — explicit TLS upgrade; use with port 110
+
+POP_HOST   = ""
+POP_PORT   = ""
+POP_SOCKET = ""
+
+# ── SMTP ─────────────────────────────────────────────────────────────────────
+# Leave SMTP_HOST empty to disable SMTP in all responses.
+# SMTP_SOCKET: SSL | STARTTLS | None
+#   STARTTLS — explicit TLS upgrade; use with port 587 (recommended)
+#   SSL      — implicit TLS; use with port 465
+
+SMTP_HOST   = "smtp.example.com"
+SMTP_PORT   = "587"
+SMTP_SOCKET = "STARTTLS"
+
+# ── ActiveSync / MobileSync ──────────────────────────────────────────────────
+# Leave MOBILESYNC_URL empty to omit the MobileSync block from Autodiscover
+# responses. Used by Outlook for Exchange ActiveSync autodiscovery.
+
+MOBILESYNC_URL  = ""
+MOBILESYNC_NAME = ""
+
+# ── LDAP ─────────────────────────────────────────────────────────────────────
+# Leave LDAP_HOST empty to omit the LDAP block from Apple mobileconfig profiles.
+
+LDAP_HOST       = ""
+LDAP_PORT       = ""
+LDAP_SOCKET     = ""
+LDAP_BASE       = ""
+LDAP_USER_FIELD = ""
+LDAP_USER_BASE  = ""
+LDAP_SEARCH     = ""
+
+# ── Apple mobileconfig ───────────────────────────────────────────────────────
+# Leave PROFILE_IDENTIFIER empty to disable the /email.mobileconfig endpoint.
+#
+# PROFILE_IDENTIFIER — reverse-DNS string identifying this profile.
+#   Example: com.example.autodiscover
+#
+# PROFILE_UUID / MAIL_UUID / LDAP_UUID — must be unique UUIDs per deployment.
+#   Generate with: uuidgen
+#   These are sensitive — do NOT put real values here.
+#   These should be set as secrets instead:
+#     wrangler secret put PROFILE_UUID
+#     wrangler secret put MAIL_UUID
+#     wrangler secret put LDAP_UUID
+
+PROFILE_IDENTIFIER = ""
+PROFILE_UUID       = ""
+MAIL_UUID          = ""
+LDAP_UUID          = ""
+
+# ── Multi-environment example ─────────────────────────────────────────────────
+# Uncomment and fill in to support `wrangler deploy --env staging` and
+# `wrangler deploy --env production`. Each stanza inherits [vars] above and
+# overrides only the values listed.
+#
+# [env.staging]
+# name = "autodiscover-email-settings-staging"
+# [env.staging.vars]
+# COMPANY_NAME = "Example Corp (staging)"
+# SUPPORT_URL  = "https://autodiscover-staging.example.com"
+# DOMAIN       = "staging.example.com"
+#
+# [env.production]
+# name = "autodiscover-email-settings"
+# [env.production.vars]
+# COMPANY_NAME = "Example Corp"
+# SUPPORT_URL  = "https://autodiscover.example.com"
+# DOMAIN       = "example.com"
