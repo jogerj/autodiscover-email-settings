@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.3](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.2...v2.0.3) (2026-04-13)
+
+
+### Miscellaneous Chores
+
+* chore: update wrangler to v4 ([ccaac07](https://github.com/jogerj/autodiscover-email-settings/commit/ccaac0700e717c9f5b8255e6bea65c6f64ab4760))
+* docs: remove references to NPM ([91f2bff](https://github.com/jogerj/autodiscover-email-settings/commit/91f2bffdfbd4d48676640f0b931cdd4dafb0a05d)
+
 ## [2.0.2](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.1...v2.0.2) (2026-04-13)
 
 
