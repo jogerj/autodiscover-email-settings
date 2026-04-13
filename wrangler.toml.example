@@ -8,11 +8,6 @@
 #   wrangler dev          # local dev on http://localhost:8787
 #   wrangler deploy       # deploy to Cloudflare Workers
 #
-# Sensitive values (UUIDs) must be set as secrets rather than vars:
-#   wrangler secret put PROFILE_UUID
-#   wrangler secret put MAIL_UUID
-#   wrangler secret put LDAP_UUID
-#
 # For multi-environment deployments (staging / production), add
 # [env.staging] and [env.production] stanzas at the bottom of this file.
 # See the commented example at the end of this file.
@@ -91,11 +86,6 @@ LDAP_SEARCH     = ""
 #
 # PROFILE_UUID / MAIL_UUID / LDAP_UUID — must be unique UUIDs per deployment.
 #   Generate with: uuidgen
-#   These are sensitive — do NOT put real values here.
-#   These should be set as secrets instead:
-#     wrangler secret put PROFILE_UUID
-#     wrangler secret put MAIL_UUID
-#     wrangler secret put LDAP_UUID
 
 PROFILE_IDENTIFIER = ""
 PROFILE_UUID       = ""
@@ -120,3 +110,37 @@ LDAP_UUID          = ""
 # COMPANY_NAME = "Example Corp"
 # SUPPORT_URL  = "https://autodiscover.example.com"
 # DOMAIN       = "example.com"
+
+
+[vars]
+COMPANY_NAME = "My Company"
+SUPPORT_URL  = "https://autodiscover.example.com"
+DOMAIN       = "example.com"
+
+IMAP_HOST   = "imap.example.com"
+IMAP_PORT   = "993"
+IMAP_SOCKET = "SSL"
+
+SMTP_HOST   = "smtp.example.com"
+SMTP_PORT   = "587"
+SMTP_SOCKET = "STARTTLS"
+
+POP_HOST    = "pop3.example.com"
+POP_PORT    = "995"
+POP_SOCKET  = "SSL"
+
+LDAP_HOST=ldap.example.com
+LDAP_PORT=636
+LDAP_SOCKET=SSL
+LDAP_BASE=dc=ldap,dc=example,dc=com
+LDAP_USER_FIELD=uid
+LDAP_USER_BASE=ou=People,dc=ldap,dc=example,dc=com
+LDAP_SEARCH=(|(objectClass=PostfixBookMailAccount))
+
+MOBILESYNC_URL=https://sync.example.com
+MOBILESYNC_NAME=sync.example.com
+
+PROFILE_IDENTIFIER=com.example.autodiscover
+PROFILE_UUID=92943D26-CAB3-4086-897D-DC6C0D8B1E86
+MAIL_UUID=7A981A9E-D5D0-4EF8-87FE-39FD6A506FAC
+LDAP_UUID=6ECB6BA9-2208-4ABF-9E60-4E9F4CD7309E

@@ -48,18 +48,32 @@ IMAP_HOST   = "imap.example.com"
 IMAP_PORT   = "993"
 IMAP_SOCKET = "SSL"
 
+POP_HOST    = "pop3.example.com"
+POP_PORT    = "995"
+POP_SOCKET  = "SSL"
+
 SMTP_HOST   = "smtp.example.com"
 SMTP_PORT   = "587"
 SMTP_SOCKET = "STARTTLS"
+
+LDAP_HOST=ldap.example.com
+LDAP_PORT=636
+LDAP_SOCKET=SSL
+LDAP_BASE=dc=ldap,dc=example,dc=com
+LDAP_USER_FIELD=uid
+LDAP_USER_BASE=ou=People,dc=ldap,dc=example,dc=com
+LDAP_SEARCH=(|(objectClass=PostfixBookMailAccount))
+
+MOBILESYNC_URL=https://sync.example.com
+MOBILESYNC_NAME=sync.example.com
+
+PROFILE_IDENTIFIER=com.example.autodiscover
+PROFILE_UUID=92943D26-CAB3-4086-897D-DC6C0D8B1E86
+MAIL_UUID=7A981A9E-D5D0-4EF8-87FE-39FD6A506FAC
+LDAP_UUID=6ECB6BA9-2208-4ABF-9E60-4E9F4CD7309E
 ```
 
-For secrets (UUIDs, etc.) use `wrangler secret put` instead of `[vars]`:
-
-```bash
-wrangler secret put PROFILE_UUID
-wrangler secret put MAIL_UUID
-wrangler secret put LDAP_UUID
-```
+Generate unique UUIDs for your deployment with `uuidgen` (or any UUID generator).
 
 #### 3. Test locally
 
@@ -111,7 +125,7 @@ docker run -p 8000:8000 \
 ```yaml
 services:
   autodiscover:
-    build: .
+    image: jogerj/autodiscover-email-settings:latest
     ports:
       - "8000:8000"
     environment:
@@ -123,24 +137,24 @@ services:
       - IMAP_PORT=993
       - IMAP_SOCKET=SSL
       # POP3 (leave POP_HOST empty to disable)
-      - POP_HOST=
-      - POP_PORT=
-      - POP_SOCKET=
+      - POP_HOST=pop3.example.com
+      - POP_PORT=995
+      - POP_SOCKET=SSL
       # SMTP (leave SMTP_HOST empty to disable)
       - SMTP_HOST=smtp.example.com
       - SMTP_PORT=587
       - SMTP_SOCKET=STARTTLS
       # ActiveSync (leave MOBILESYNC_URL empty to disable)
-      - MOBILESYNC_URL=
-      - MOBILESYNC_NAME=
+      - MOBILESYNC_URL=https://sync.example.com
+      - MOBILESYNC_NAME=sync.example.com
       # LDAP (leave LDAP_HOST empty to disable)
-      - LDAP_HOST=
-      - LDAP_PORT=
-      - LDAP_SOCKET=
-      - LDAP_BASE=
-      - LDAP_USER_FIELD=
-      - LDAP_USER_BASE=
-      - LDAP_SEARCH=
+      - LDAP_HOST=ldap.example.com
+      - LDAP_PORT=636
+      - LDAP_SOCKET=SSL
+      - LDAP_BASE=dc=ldap,dc=example,dc=com
+      - LDAP_USER_FIELD=uid
+      - LDAP_USER_BASE=ou=People,dc=ldap,dc=example,dc=com
+      - LDAP_SEARCH=(|(objectClass=PostfixBookMailAccount))
       # iOS profile (leave PROFILE_IDENTIFIER empty to disable)
       - PROFILE_IDENTIFIER=com.example.autodiscover
       - PROFILE_UUID=92943D26-CAB3-4086-897D-DC6C0D8B1E86
@@ -174,6 +188,16 @@ server {
     }
 }
 ```
+
+### Caddy reverse proxy
+
+```caddy
+autoconfig.example.com, autodiscover.example.com {
+    reverse_proxy autodiscover:8000
+}
+```
+
+Put Caddy on the same docker network as the `autodiscover` service. Caddy handles TLS automatically via Let's Encrypt — no certificate paths needed.
 
 ---
 
