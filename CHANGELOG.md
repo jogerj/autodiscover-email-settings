@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.2](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.1...v2.0.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* **ci:** add cache for bun ([2c40879](https://github.com/jogerj/autodiscover-email-settings/commit/2c40879e0cbfa03626b4228786573f12003e27a1))
+* **ci:** push docker image on release ([382d4ff](https://github.com/jogerj/autodiscover-email-settings/commit/382d4ff845c9dc5f24661f9d445425bcbf354811))
+* **ci:** push docker image on release ([11e6dd1](https://github.com/jogerj/autodiscover-email-settings/commit/11e6dd156b67dbe2a12c505991d513deb0ef17e0))
+
 ## [2.0.1](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.0...v2.0.1) (2026-04-13)
 
 
