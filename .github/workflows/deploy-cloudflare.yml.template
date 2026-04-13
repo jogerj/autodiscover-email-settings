@@ -60,12 +60,32 @@ jobs:
 
       - run: bun run test
 
+      # Upload secrets — values that cannot be committed to wrangler.toml.
+      # Secrets are passed via env: to avoid shell injection.
+      # A secret is only uploaded if the GitHub secret is set; unset secrets
+      # are skipped so any value already stored in the CF dashboard is preserved.
+      - name: Upload secrets to Cloudflare Workers
+        run: |
+          upload_secret() {
+            local name="$1" value="$2"
+            [ -n "${value}" ] && printf '%s' "${value}" | wrangler secret put "${name}" --env "${{ inputs.environment }}"
+          }
+          upload_secret PROFILE_UUID "$PROFILE_UUID"
+          upload_secret MAIL_UUID    "$MAIL_UUID"
+          upload_secret LDAP_UUID    "$LDAP_UUID"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          PROFILE_UUID: ${{ secrets.PROFILE_UUID }}
+          MAIL_UUID: ${{ secrets.MAIL_UUID }}
+          LDAP_UUID: ${{ secrets.LDAP_UUID }}
+
+      # All other configuration lives in wrangler.toml [vars] / [env.<name>.vars].
+      # The pipeline does not override vars — there is no safe way to distinguish
+      # "not set in GitHub" from "intentionally set to empty" via ${{ vars.X }}.
       - name: Deploy to Cloudflare Workers (${{ inputs.environment }})
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
-          # Passes --env <environment> to wrangler deploy, selecting the
-          # matching [env.<name>] stanza from wrangler.toml.
           environment: ${{ inputs.environment }}
 
 # ─── Caller example ──────────────────────────────────────────────────────────

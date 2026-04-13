@@ -34,6 +34,7 @@ node_modules
 .wrangler
 .dev.vars
 dist
+wrangler.toml
 
 # npm lockfile (project uses bun)
 package-lock.json
