@@ -28,12 +28,22 @@ on:
         options:
           - staging
           - production
+      wrangler_config_path:
+        description: "Path to wrangler.toml (relative to repo root)"
+        required: false
+        default: wrangler.toml
+        type: string
 
   workflow_call:
     inputs:
       environment:
         description: "Target environment (must match a wrangler.toml [env.<name>] stanza)"
         required: true
+        type: string
+      wrangler_config_path:
+        description: "Path to wrangler.toml (relative to repo root)"
+        required: false
+        default: wrangler.toml
         type: string
     secrets:
       CF_API_TOKEN:
@@ -65,6 +75,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           environment: ${{ inputs.environment }}
+          configPath: ${{ inputs.wrangler_config_path }}
 
 # ─── Caller example ──────────────────────────────────────────────────────────
 #
