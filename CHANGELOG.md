@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.3...v2.1.0) (2026-04-14)
+
+
+### Features
+
+* make wrangler path configurable ([18d82b7](https://github.com/jogerj/autodiscover-email-settings/commit/18d82b72bfe0fc1d50d789e27adfb486cfd09a91))
+
+
+### Bug Fixes
+
+* remove CI steps to add env from secret ([b0b8591](https://github.com/jogerj/autodiscover-email-settings/commit/b0b85919f4579998bb9c2cb3043fe4536841bf8e))
+
 ## [2.0.3](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.2...v2.0.3) (2026-04-13)
 
 

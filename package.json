@@ -1,6 +1,6 @@
 {
   "name": "autodiscover-email-settings",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "type": "module",
   "description": "Provides IMAP/SMTP/LDAP Autodiscover capabilities on Microsoft Outlook/Apple Mail, Autoconfig capabilities for Thunderbird, and Configuration Profiles for iOS/Apple Mail.",
   "repository": {
