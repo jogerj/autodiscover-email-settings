@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.1...v2.0.2) (2026-04-15)
+
+
+### Bug Fixes
+
+* remove redundant checkout step ([c993fc9](https://github.com/jogerj/autodiscover-email-settings/commit/c993fc9a2efea13d5e333640ae14730c597e8017))
+
 ## [2.0.1](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.0...v2.0.1) (2026-04-15)
 
 
