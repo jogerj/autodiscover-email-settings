@@ -26,6 +26,8 @@ Provides email client auto-configuration for:
     - [1. Configure `wrangler.toml`](#1-configure-wranglertoml)
     - [2. Add repository secret](#2-add-repository-secret)
     - [3. Create a workflow](#3-create-a-workflow)
+  - [Cloudflare Workers (self deployment)](#cloudflare-workers-self-deployment)
+  - [Cloudflare Workers (manual upload)](#cloudflare-workers-manual-upload)
   - [Docker (self-hosted)](#docker-self-hosted)
     - [Docker Compose](#docker-compose)
     - [Docker standalone](#docker-standalone)
@@ -94,7 +96,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy to Cloudflare Workers
         uses: jogerj/autodiscover-email-settings@v2
@@ -124,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Deploy to Cloudflare Workers
         uses: jogerj/autodiscover-email-settings@v2
@@ -142,6 +144,10 @@ jobs:
 | `config_path` | Path to `wrangler.toml` relative to repo root | `wrangler.toml` |
 | `worker_name` | Name to deploy the worker under | `autodiscover-email-settings` |
 
+### Cloudflare Workers (self deployment)
+
+See [Development](#5-deploy-cli) for deploying with the Wrangler CLI. This is an option if you do not want to use GitHub Actions.
+
 ### Cloudflare Workers (manual upload)
 
 Each [release](https://github.com/jogerj/autodiscover-email-settings/releases) includes a pre-built `worker.js`. You can upload it directly in the Cloudflare dashboard without any local tooling or CI setup.
@@ -149,7 +155,7 @@ Each [release](https://github.com/jogerj/autodiscover-email-settings/releases) i
 1. Download `worker.js` from the [latest release](https://github.com/jogerj/autodiscover-email-settings/releases/latest).
 2. In the Cloudflare dashboard go to **Workers & Pages → Create → Upload a Worker**.
 3. Upload `worker.js` and give the worker a name, then click **Deploy**.
-4. Open the worker's **Settings → Variables and Secrets** and add each variable from the [Configuration reference](#configuration-reference).
+4. Open the worker's **Settings → Variables and Secrets** and add each variable from the [Configuration reference](#configuration-reference). You can modify the `wrangler.toml.example` file and copy-paste the whole text under `[vars]` into the Cloudflare dashboard to quickly add or edit variables (The syntax would be equivalent to a `.env` file).
 
 ---
 
