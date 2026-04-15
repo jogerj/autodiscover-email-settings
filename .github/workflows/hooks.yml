@@ -69,7 +69,7 @@ jobs:
       - name: Attach worker bundle to release
         run: |
           mv index.js worker.js
-          gh release upload ${{ needs.release-please.outputs.tag_name }} worker.js
+          gh release upload ${{ needs.release-please.outputs.tag_name }} worker.js --repo $GITHUB_REPOSITORY
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
