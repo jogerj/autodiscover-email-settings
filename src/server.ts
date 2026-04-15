@@ -1,5 +1,5 @@
 /**
- * Bun / Node.js entry point.
+ * Bun entry point.
  *
  * Passes process.env to the shared Hono app so that c.env inside every
  * route handler is populated the same way as when running on CF Workers.
