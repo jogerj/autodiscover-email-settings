@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/jogerj/autodiscover-email-settings/compare/v2.0.0...v2.0.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* **ci:** add repo reference in attaching file ([cdea14f](https://github.com/jogerj/autodiscover-email-settings/commit/cdea14f94da5de5ce9f4aa04c90cc5149e17bfdf))
+
 ## [2.0.0](https://github.com/jogerj/autodiscover-email-settings/compare/66c144e923f245dc0b4e64421449afedcad64052...v2.0.0) (2026-04-14)
 
 
